@@ -1,0 +1,112 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="title">Объект по ID</ui:define>
+
+    <ui:define name="metadata">
+        <f:metadata>
+            <f:viewParam name="id" value="#{viewController.id}" converterMessage="id должен быть числом"/>
+            <f:viewAction action="#{viewController.onLoad}"/>
+        </f:metadata>
+    </ui:define>
+
+    <ui:define name="content">
+
+        <h:form id="searchForm">
+            <div class="card op">
+                <p:outputLabel for="id" value="ID объекта"/>
+                <p:inputNumber id="id" value="#{viewController.id}" decimalPlaces="0" minValue="1"
+                               maxValue="9000000000000000" thousandSeparator="" required="true"
+                               requiredMessage="Введите id"/>
+                <p:commandButton value="Найти" icon="pi pi-search" action="#{viewController.find}"
+                                 process="@form" update="@form :viewForm"/>
+                <p:message for="id" display="text"/>
+            </div>
+        </h:form>
+
+        <h:form id="viewForm">
+            <p:remoteCommand name="refreshPage" process="@this" global="false"
+                             actionListener="#{viewController.refresh}" update="details"/>
+            <p:messages id="messages" closable="true"/>
+            <p:outputPanel id="details">
+
+                <h:panelGroup rendered="#{viewController.searched and viewController.creature == null}">
+                    <div class="card muted">Объект не найден.</div>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{viewController.creature != null}">
+                    <div class="details">
+                        <div class="card">
+                            <h2>Персонаж ##{viewController.creature.id}</h2>
+                            <div class="kv">
+                                <span class="k">Имя</span><h:outputText value="#{viewController.creature.name}"/>
+                                <span class="k">Дата создания</span>
+                                <h:outputText value="#{viewController.creature.creationDate}">
+                                    <f:convertDateTime type="localDateTime" pattern="dd.MM.yyyy HH:mm:ss"/>
+                                </h:outputText>
+                                <span class="k">Возраст</span><h:outputText value="#{viewController.creature.age}"/>
+                                <span class="k">Тип</span><h:outputText value="#{viewController.creature.creatureType}"/>
+                                <span class="k">Уровень атаки</span><h:outputText value="#{viewController.creature.attackLevel != null ? viewController.creature.attackLevel : '—'}"/>
+                                <span class="k">Уровень защиты</span><h:outputText value="#{viewController.creature.defenseLevel != null ? viewController.creature.defenseLevel : '—'}"/>
+                            </div>
+                            <div class="actions">
+                                <p:commandButton value="Изменить" icon="pi pi-pencil" process="@this"
+                                                 actionListener="#{editController.open(viewController.creature.id)}"
+                                                 update=":editDlg viewForm:messages"
+                                                 oncomplete="if (!args.validationFailed) PF('editDlg').show()"/>
+                                <p:commandButton value="Удалить" icon="pi pi-trash" styleClass="ui-button-danger"
+                                                 process="@this" action="#{viewController.delete}" update="viewForm">
+                                    <p:confirm header="Удаление" icon="pi pi-exclamation-triangle"
+                                               message="Удалить объект ##{viewController.creature.id}? Связанные с ним объекты тоже будут удалены."/>
+                                </p:commandButton>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h2>Координаты ##{viewController.creature.coordinates.id}</h2>
+                            <div class="kv">
+                                <span class="k">X</span><h:outputText value="#{viewController.creature.coordinates.x}"/>
+                                <span class="k">Y</span><h:outputText value="#{viewController.creature.coordinates.y}"/>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h2>Город ##{viewController.creature.creatureLocation.id}</h2>
+                            <div class="kv">
+                                <span class="k">Название</span><h:outputText value="#{viewController.creature.creatureLocation.name}"/>
+                                <span class="k">Площадь</span><h:outputText value="#{viewController.creature.creatureLocation.area}"/>
+                                <span class="k">Население</span><h:outputText value="#{viewController.creature.creatureLocation.population}"/>
+                                <span class="k">Дата основания</span>
+                                <h:outputText value="#{viewController.creature.creatureLocation.establishmentDate}" rendered="#{viewController.creature.creatureLocation.establishmentDate != null}">
+                                    <f:convertDateTime type="localDate" pattern="dd.MM.yyyy"/>
+                                </h:outputText>
+                                <h:outputText value="—" rendered="#{viewController.creature.creatureLocation.establishmentDate == null}"/>
+                                <span class="k">Правитель</span><h:outputText value="#{viewController.creature.creatureLocation.governor}"/>
+                                <span class="k">Столица</span><h:outputText value="#{viewController.creature.creatureLocation.capital ? 'да' : 'нет'}"/>
+                                <span class="k">Плотность</span><h:outputText value="#{viewController.creature.creatureLocation.populationDensity != null ? viewController.creature.creatureLocation.populationDensity : '—'}"/>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <h2>Кольцо</h2>
+                            <h:panelGroup styleClass="kv" layout="block" rendered="#{viewController.creature.ring != null}">
+                                <span class="k">ID</span><h:outputText value="#{viewController.creature.ring.id}"/>
+                                <span class="k">Название</span><h:outputText value="#{viewController.creature.ring.name}"/>
+                                <span class="k">Вес</span><h:outputText value="#{viewController.creature.ring.weight}"/>
+                            </h:panelGroup>
+                            <h:outputText styleClass="muted" value="Нет кольца" rendered="#{viewController.creature.ring == null}"/>
+                        </div>
+                    </div>
+                </h:panelGroup>
+            </p:outputPanel>
+        </h:form>
+
+        <ui:include src="/WEB-INF/includes/edit-dialog.xhtml">
+            <ui:param name="afterSave" value=":viewForm"/>
+        </ui:include>
+    </ui:define>
+</ui:composition>

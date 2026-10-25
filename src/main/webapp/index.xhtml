@@ -1,0 +1,105 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="title">Персонажи</ui:define>
+
+    <ui:define name="content">
+        <h:form id="tableForm">
+            <p:messages id="messages" closable="true"/>
+
+            <p:remoteCommand name="refreshPage" process="@none" update="tbl" global="false"/>
+
+            <div class="card">
+                <p:dataTable id="tbl" widgetVar="tbl" var="c" value="#{tableController.model}" lazy="true"
+                             paginator="true" rows="10" rowsPerPageTemplate="5,10,20,50"
+                             paginatorPosition="bottom" filterEvent="enter"
+                             currentPageReportTemplate="{startRecord}–{endRecord} из {totalRecords}"
+                             paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                             emptyMessage="Объектов нет" size="small" stripedRows="true" rowKey="#{c.id}"
+                             reflow="true">
+                    <f:facet name="header">
+                        <div style="display:flex; justify-content:space-between; align-items:center">
+                            <span>Фильтр по строковым колонкам - полное совпадение (Enter для применения)</span>
+                            <p:button value="Добавить" icon="pi pi-plus" outcome="/create"/>
+                        </div>
+                    </f:facet>
+
+                    <p:column headerText="ID" sortBy="#{c.id}" filterable="false" field="id" width="60">
+                        <h:outputText value="#{c.id}"/>
+                    </p:column>
+                    <p:column headerText="Имя" sortBy="#{c.name}" filterBy="#{c.name}" field="name"
+                              filterMatchMode="exact">
+                        <h:outputText value="#{c.name}"/>
+                    </p:column>
+                    <p:column headerText="X" sortBy="#{c.coordinates.x}" filterable="false" field="x">
+                        <h:outputText value="#{c.coordinates.x}"/>
+                    </p:column>
+                    <p:column headerText="Y" sortBy="#{c.coordinates.y}" filterable="false" field="y">
+                        <h:outputText value="#{c.coordinates.y}"/>
+                    </p:column>
+                    <p:column headerText="Создан" sortBy="#{c.creationDate}" filterable="false" field="creationDate">
+                        <h:outputText value="#{c.creationDate}">
+                            <f:convertDateTime type="localDateTime" pattern="dd.MM.yyyy HH:mm"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Возраст" sortBy="#{c.age}" filterable="false" field="age">
+                        <h:outputText value="#{c.age}"/>
+                    </p:column>
+                    <p:column headerText="Тип" sortBy="#{c.creatureType}" filterBy="#{c.creatureType}"
+                              field="creatureType" filterMatchMode="exact">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('tbl').filter()">
+                                <f:selectItem itemLabel="Все" itemValue="#{null}" noSelectionOption="true"/>
+                                <f:selectItems value="#{options.creatureTypes}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{c.creatureType}"/>
+                    </p:column>
+                    <p:column headerText="Город" sortBy="#{c.creatureLocation.name}"
+                              filterBy="#{c.creatureLocation.name}" field="cityName" filterMatchMode="exact">
+                        <h:outputText value="#{c.creatureLocation.name}"/>
+                    </p:column>
+                    <p:column headerText="Атака" sortBy="#{c.attackLevel}" filterable="false" field="attackLevel">
+                        <h:outputText value="#{c.attackLevel}"/>
+                    </p:column>
+                    <p:column headerText="Защита" sortBy="#{c.defenseLevel}" filterable="false" field="defenseLevel">
+                        <h:outputText value="#{c.defenseLevel}"/>
+                    </p:column>
+                    <p:column headerText="Кольцо" sortBy="#{c.ring.name}" filterBy="#{c.ring.name}"
+                              field="ringName" filterMatchMode="exact">
+                        <h:outputText value="#{c.ring.name}"/>
+                    </p:column>
+                    <p:column headerText="Вес кольца" sortBy="#{c.ring.weight}" filterable="false" field="ringWeight">
+                        <h:outputText value="#{c.ring.weight}"/>
+                    </p:column>
+
+                    <p:column headerText="Действия" styleClass="row-actions" width="130">
+                        <p:button icon="pi pi-eye" title="Просмотр" outcome="/view"
+                                  styleClass="ui-button-flat rounded-button">
+                            <f:param name="id" value="#{c.id}"/>
+                        </p:button>
+                        <p:commandButton icon="pi pi-pencil" title="Изменить" process="@this"
+                                         styleClass="ui-button-flat rounded-button"
+                                         actionListener="#{editController.open(c.id)}"
+                                         update=":editDlg :tableForm:messages"
+                                         oncomplete="if (!args.validationFailed) PF('editDlg').show()"/>
+                        <p:commandButton icon="pi pi-trash" title="Удалить" process="@this"
+                                         styleClass="ui-button-flat ui-button-danger rounded-button"
+                                         action="#{tableController.delete(c.id)}" update=":tableForm:tbl :tableForm:messages">
+                            <p:confirm header="Удаление" icon="pi pi-exclamation-triangle"
+                                       message="Удалить объект ##{c.id} «#{c.name}»? Связанные с ним объекты тоже будут удалены."/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </div>
+        </h:form>
+
+        <ui:include src="/WEB-INF/includes/edit-dialog.xhtml">
+            <ui:param name="afterSave" value=":tableForm:tbl :tableForm:messages"/>
+        </ui:include>
+    </ui:define>
+</ui:composition>

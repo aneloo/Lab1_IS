@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui">
+<ui:insert name="metadata"/>
+<h:head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title><ui:insert name="title">BookCreature</ui:insert> · ИС ЛР1</title>
+    <h:outputStylesheet name="css/app.css"/>
+    <h:outputScript name="js/app.js"/>
+</h:head>
+<h:body>
+    <h:form id="menuForm">
+        <p:menubar styleClass="app-menu">
+            <p:menuitem value="Объекты" icon="pi pi-table" outcome="/index"/>
+            <p:menuitem value="Добавить" icon="pi pi-plus" outcome="/create"/>
+            <p:menuitem value="Объект по ID" icon="pi pi-search" outcome="/view"/>
+            <p:menuitem value="Спецоперации" icon="pi pi-bolt" outcome="/special"/>
+            <p:menuitem value="Связанные объекты" icon="pi pi-sitemap" outcome="/related"/>
+            <f:facet name="options">
+                <span class="app-user"><i class="pi pi-user"/> #{userSession.username}</span>
+                <p:commandButton value="Выход" icon="pi pi-sign-out" action="#{loginController.logout}"
+                                 styleClass="ui-button-outlined ui-button-secondary" ajax="false"/>
+            </f:facet>
+        </p:menubar>
+    </h:form>
+
+    <p:growl id="growl" widgetVar="notifier" for="push-only" showDetail="true" life="5000"/>
+
+    <main class="app-content">
+        <h1 class="app-title"><ui:insert name="title"/></h1>
+        <ui:insert name="content"/>
+    </main>
+
+    <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="380">
+        <p:commandButton value="Да" type="button" styleClass="ui-confirmdialog-yes ui-button-danger" icon="pi pi-check"/>
+        <p:commandButton value="Отмена" type="button" styleClass="ui-confirmdialog-no ui-button-flat" icon="pi pi-times"/>
+    </p:confirmDialog>
+
+    <h:form id="pushForm">
+        <f:websocket channel="creatures" onmessage="IS.onChange"/>
+    </h:form>
+    <script>IS.currentUser = '#{userSession.username}';</script>
+</h:body>
+</html>

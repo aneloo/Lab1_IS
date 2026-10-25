@@ -1,0 +1,4 @@
+db.url=jdbc:postgresql://pg:5432/studs
+db.user=s******
+db.password=пароль
+pg.driver.jar=postgresql-42.7.8.jar

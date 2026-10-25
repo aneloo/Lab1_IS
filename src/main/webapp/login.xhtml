@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <meta charset="UTF-8"/>
+    <title>Вход ИС ЛР1</title>
+    <h:outputStylesheet name="css/app.css"/>
+</h:head>
+<h:body>
+    <div class="auth-wrap">
+        <h:form id="loginForm" styleClass="card auth-card">
+            <h2>Вход в систему</h2>
+            <p:messages closable="true"/>
+            <div class="field">
+                <p:outputLabel for="username" value="Логин"/>
+                <p:inputText id="username" value="#{loginController.username}" required="true"
+                             requiredMessage="Введите логин"/>
+            </div>
+            <div class="field">
+                <p:outputLabel for="password" value="Пароль"/>
+                <p:password id="password" value="#{loginController.password}" required="true"
+                            requiredMessage="Введите пароль" toggleMask="true"/>
+            </div>
+            <div class="actions">
+                <p:commandButton value="Войти" icon="pi pi-sign-in" action="#{loginController.login}"
+                                 update="@form" type="submit"/>
+                <p:button value="Регистрация" outcome="/register" styleClass="ui-button-flat"/>
+            </div>
+        </h:form>
+    </div>
+</h:body>
+</html>

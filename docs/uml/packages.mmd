@@ -1,0 +1,40 @@
+flowchart TB
+    browser["Браузер<br/>Facelets-страницы: index, create, view,<br/>special, related, login, register"]
+    subgraph war["is-lab1.war · WildFly · Jakarta EE 10"]
+        direction TB
+        subgraph webpkg["«package» web"]
+            direction LR
+            controller["controller<br/>CreatureTableController, CreateCreatureController,<br/>EditCreatureController, ViewCreatureController,<br/>SpecialOperationsController, RelatedObjectsController,<br/>LoginController"]
+            form["form<br/>CreatureForm, CreatureFormMapper,<br/>CreatureFormOptionsLoader, FormOptions"]
+            webmodel["model<br/>CreatureLazyModel"]
+            error["error<br/>FacesExceptionHandler"]
+            message["message<br/>FacesMessages"]
+        end
+        security["«package» security<br/>AuthFilter, UserSession, PasswordHasher"]
+        dto["«package» dto<br/>BookCreatureDto, CoordinatesDto, MagicCityDto,<br/>RingDto, CreatureRequest, RelationLink,<br/>UsageDto, RingUsageDto, UserDto"]
+        service["«package» service<br/>BookCreatureService, CreatureQuery, CreatureQueryTranslator,<br/>CreatureDeletionService, RelatedObjectResolver, CreatureValidator,<br/>RelatedObjectsService, SpecialOperationsService, AuthService"]
+        exception["«package» exception<br/>BusinessException и наследники,<br/>PersistenceErrorTranslator"]
+        mapper["«package» mapper<br/>MapStruct: BookCreatureMapper, CoordinatesMapper,<br/>MagicCityMapper, RingMapper, UserMapper"]
+        event["«package» event<br/>ChangeEvent"]
+        push["«package» push<br/>ChangeNotifier (Faces WebSocket)"]
+        repository["«package» repository<br/>BookCreatureRepository, RelatedObjectsRepository,<br/>UserRepository, CreatureCriteria, CreatureColumn (EclipseLink JPA)"]
+        model["«package» model<br/>BookCreature, Coordinates, MagicCity, Ring, AppUser"]
+    end
+    db[("PostgreSQL<br/>pg:5432/studs")]
+
+    browser -- "HTTP / AJAX" --> webpkg
+    push -- "WebSocket" --> browser
+    security --> webpkg
+    webpkg --> service
+    webpkg --> dto
+    error --> exception
+    service --> dto
+    service --> mapper
+    service --> repository
+    service --> exception
+    service -. "CDI-событие" .-> event
+    event --> push
+    mapper --> dto
+    mapper --> model
+    repository --> model
+    repository -- "JDBC, java:jboss/datasources/BookCreaturesDS" --> db

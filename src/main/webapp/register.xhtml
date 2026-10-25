@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+<h:head>
+    <meta charset="UTF-8"/>
+    <title>Регистрация · ИС ЛР1</title>
+    <h:outputStylesheet name="css/app.css"/>
+</h:head>
+<h:body>
+    <div class="auth-wrap">
+        <h:form id="registerForm" styleClass="card auth-card">
+            <h2>Регистрация</h2>
+            <p:messages closable="true"/>
+            <div class="field">
+                <p:outputLabel for="username" value="Логин (латиница, цифры, _ . -)"/>
+                <p:inputText id="username" value="#{loginController.username}" required="true"
+                             requiredMessage="Введите логин" maxlength="64"/>
+            </div>
+            <div class="field">
+                <p:outputLabel for="password" value="Пароль (от 4 символов)"/>
+                <p:password id="password" value="#{loginController.password}" required="true"
+                            requiredMessage="Введите пароль" toggleMask="true"/>
+            </div>
+            <div class="field">
+                <p:outputLabel for="password2" value="Повторите пароль"/>
+                <p:password id="password2" value="#{loginController.passwordRepeat}" required="true"
+                            requiredMessage="Повторите пароль" toggleMask="true"/>
+            </div>
+            <div class="actions">
+                <p:commandButton value="Зарегистрироваться" icon="pi pi-user-plus" action="#{loginController.register}"
+                                 update="@form" type="submit"/>
+                <p:button value="Уже есть аккаунт" outcome="/login" styleClass="ui-button-flat"/>
+            </div>
+        </h:form>
+    </div>
+</h:body>
+</html>

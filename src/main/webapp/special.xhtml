@@ -1,0 +1,142 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="title">Специальные операции</ui:define>
+
+    <ui:define name="content">
+        <p:messages id="messages" globalOnly="true" closable="true"/>
+
+        <h:form id="avgForm" styleClass="card">
+            <h2>1. Средний уровень атаки персонажей</h2>
+            <div class="op">
+                <p:commandButton value="Рассчитать" icon="pi pi-calculator"
+                                 action="#{specialController.calculateAverage}"
+                                 update="@form :messages"/>
+                <h:outputText styleClass="result" value="#{specialController.average}"
+                              rendered="#{specialController.average != null}">
+                    <f:convertNumber minFractionDigits="3" maxFractionDigits="3" groupingUsed="false" locale="en"/>
+                </h:outputText>
+                <h:outputText styleClass="result muted" value="нет объектов с заданным attackLevel"
+                              rendered="#{specialController.averageCalculated and specialController.average == null}"/>
+            </div>
+        </h:form>
+
+        <h:form id="lessForm" styleClass="card">
+            <h2>2. Количество персонажей с уровнем защиты меньше заданного</h2>
+            <div class="op">
+                <p:outputLabel for="less" value="Уровень защиты &lt;"/>
+                <p:inputNumber id="less"
+                               value="#{specialController.lessThan}"
+                               decimalPlaces="3"
+                               thousandSeparator=""
+                               decimalSeparator="."
+                               minValue="-1000000000"
+                               maxValue="1000000000"
+                               required="true"
+                               requiredMessage="Введите уровень защиты"/>
+                <p:commandButton value="Посчитать"
+                                 icon="pi pi-filter"
+                                 action="#{specialController.countLess}"
+                                 update="@form :messages"/>
+                <p:message for="less" display="text"/>
+                <h:outputText styleClass="result"
+                              value="#{specialController.lessCount} шт. с defenseLevel &lt; #{specialController.lessThan}"
+                              rendered="#{specialController.lessCount != null}"/>
+            </div>
+        </h:form>
+
+        <h:form id="greaterForm" styleClass="card">
+            <h2>3. Количество персонажей с уровнем защиты больше заданного</h2>
+            <div class="op">
+                <p:outputLabel for="greater" value="Уровень защиты &gt;"/>
+                <p:inputNumber id="greater"
+                               value="#{specialController.greaterThan}"
+                               decimalPlaces="3"
+                               thousandSeparator=""
+                               decimalSeparator="."
+                               minValue="-1000000000"
+                               maxValue="1000000000"
+                               required="true"
+                               requiredMessage="Введите уровень защиты"/>
+                <p:commandButton value="Посчитать"
+                                 icon="pi pi-filter"
+                                 action="#{specialController.countGreater}"
+                                 update="@form :messages"/>
+                <p:message for="greater" display="text"/>
+                <h:outputText styleClass="result"
+                              value="#{specialController.greaterCount} шт. с defenseLevel &gt; #{specialController.greaterThan}"
+                              rendered="#{specialController.greaterCount != null}"/>
+            </div>
+        </h:form>
+
+        <h:form id="swapForm" styleClass="card">
+            <h2>4. Обмен кольцами между персонажами</h2>
+            <div class="op">
+                <p:outputLabel for="first" value="ID первого персонажа"/>
+                <p:inputNumber id="first"
+                               value="#{specialController.firstId}"
+                               decimalPlaces="0"
+                               minValue="1"
+                               maxValue="9000000000000000"
+                               thousandSeparator=""
+                               required="true"
+                               requiredMessage="Введите ID первого персонажа"/>
+
+                <p:outputLabel for="second" value="ID второго персонажа"/>
+                <p:inputNumber id="second"
+                               value="#{specialController.secondId}"
+                               decimalPlaces="0"
+                               minValue="1"
+                               maxValue="9000000000000000"
+                               thousandSeparator=""
+                               required="true"
+                               requiredMessage="Введите ID второго персонажа"/>
+
+                <p:commandButton value="Обменять"
+                                 icon="pi pi-sync"
+                                 action="#{specialController.swap}"
+                                 update="@form :messages"/>
+
+                <h:outputText styleClass="result"
+                              value="Персонажи ##{specialController.firstId} и ##{specialController.secondId} обменялись кольцами"
+                              rendered="#{specialController.swapped}"/>
+            </div>
+
+            <p:message for="first" display="text"/>
+            <p:message for="second" display="text"/>
+        </h:form>
+
+        <h:form id="strongForm" styleClass="card">
+            <h2>5. Персонаж с самым сильным кольцом</h2>
+            <p class="muted">
+                Сила кольца определяется его весом. Если вес одинаковый,
+                выбирается персонаж с меньшим ID.
+            </p>
+
+            <div class="op">
+                <p:commandButton value="Найти"
+                                 icon="pi pi-star"
+                                 action="#{specialController.findStrongest}"
+                                 update="@form :messages"/>
+
+                <h:panelGroup rendered="#{specialController.strongest != null}"
+                              styleClass="result">
+                    <h:link outcome="/view"
+                            value="##{specialController.strongest.id} «#{specialController.strongest.name}»">
+                        <f:param name="id" value="#{specialController.strongest.id}"/>
+                    </h:link>
+                    — кольцо «#{specialController.strongest.ring.name}»,
+                    вес #{specialController.strongest.ring.weight}
+                </h:panelGroup>
+
+                <h:outputText styleClass="result muted"
+                              value="Ни у одного персонажа нет кольца"
+                              rendered="#{specialController.strongestSearched and specialController.strongest == null}"/>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

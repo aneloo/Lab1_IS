@@ -1,0 +1,115 @@
+classDiagram
+    direction TB
+    class CreateCreatureController {
+        <<ViewScoped>>
+        -CreatureForm form
+        +refreshOptions()
+        +save() String
+    }
+    class EditCreatureController {
+        <<ViewScoped>>
+        -CreatureForm form
+        +open(long)
+        +save(String)
+    }
+    class CreatureForm {
+        -BookCreatureDto creature
+        -LinkMode coordinatesMode
+        -LinkMode cityMode
+        -LinkMode ringMode
+    }
+    class CreatureFormMapper {
+        <<ApplicationScoped>>
+        +toCreateForm() CreatureForm
+        +toEditForm(BookCreatureDto) CreatureForm
+        +toRequest(CreatureForm) CreatureRequest
+    }
+    class CreatureQueryTranslator {
+        <<ApplicationScoped>>
+        +translate(CreatureQuery) Optional~CreatureCriteria~
+    }
+    class CreatureTableController {
+        <<ViewScoped>>
+        +delete(long)
+    }
+    class CreatureLazyModel {
+        +load() List~BookCreatureDto~
+        +count() int
+    }
+    class FacesExceptionHandler {
+        +handle()
+    }
+    class BookCreatureService {
+        <<Stateless EJB>>
+        +findPage(CreatureQuery) List~BookCreatureDto~
+        +findById(long) Optional~BookCreatureDto~
+        +getById(long) BookCreatureDto
+        +create(CreatureRequest, String) BookCreatureDto
+        +update(long, CreatureRequest, String) BookCreatureDto
+    }
+    class CreatureDeletionService {
+        <<Stateless EJB>>
+        +delete(long, String)
+        +removeWithOrphans(List~BookCreature~)
+    }
+    class RelatedObjectResolver {
+        <<ApplicationScoped>>
+        +resolveCoordinates(RelationLink, Coordinates) Coordinates
+        +resolveCity(RelationLink, MagicCity) MagicCity
+        +resolveRing(RelationLink, Ring, Long) Ring
+        +persistNew(BookCreature)
+    }
+    class CreatureValidator {
+        <<ApplicationScoped>>
+        +validate(BookCreature)
+    }
+    class RelatedObjectsService {
+        <<Stateless EJB>>
+        +coordinatesWithUsage() List~UsageDto~
+        +citiesWithUsage() List~UsageDto~
+        +ringsWithOwners() List~RingUsageDto~
+        +deleteCoordinates(long, String) int
+        +deleteCity(long, String) int
+        +deleteRing(long, String)
+    }
+    class BookCreatureMapper {
+        <<MapStruct>>
+        +toDto(BookCreature) BookCreatureDto
+        +updateFields(BookCreatureDto, BookCreature)
+    }
+    class PersistenceErrorTranslator {
+        <<Interceptor>>
+        +translate(InvocationContext) Object
+    }
+    class BusinessException {
+        <<ApplicationException>>
+        +getMessages() List~String~
+    }
+    class BookCreatureRepository {
+        <<ApplicationScoped>>
+        +findPage(CreatureCriteria) List~BookCreature~
+        +findByIdForUpdate(long) Optional~BookCreature~
+    }
+    class ChangeNotifier {
+        <<ApplicationScoped>>
+        +onChange(ChangeEvent)
+    }
+
+    CreateCreatureController --> CreatureFormMapper
+    EditCreatureController --> CreatureFormMapper
+    CreatureFormMapper ..> CreatureForm : creates
+    CreateCreatureController --> BookCreatureService
+    EditCreatureController --> BookCreatureService
+    CreatureTableController --> CreatureLazyModel
+    CreatureTableController --> CreatureDeletionService
+    CreatureLazyModel --> BookCreatureService
+    BookCreatureService --> CreatureQueryTranslator
+    BookCreatureService --> RelatedObjectResolver
+    BookCreatureService --> CreatureValidator
+    BookCreatureService --> BookCreatureMapper
+    BookCreatureService --> BookCreatureRepository
+    CreatureDeletionService --> BookCreatureRepository
+    RelatedObjectsService --> CreatureDeletionService
+    PersistenceErrorTranslator ..> BusinessException : creates
+    FacesExceptionHandler ..> BusinessException : shows messages
+    BookCreatureService ..> ChangeNotifier : ChangeEvent after commit

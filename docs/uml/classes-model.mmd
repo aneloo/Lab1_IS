@@ -1,0 +1,56 @@
+classDiagram
+    direction LR
+    class BookCreature {
+        -long id
+        -String name
+        -Coordinates coordinates
+        -LocalDateTime creationDate
+        -int age
+        -BookCreatureType creatureType
+        -MagicCity creatureLocation
+        -Integer attackLevel
+        -Float defenseLevel
+        -Ring ring
+        -long version
+    }
+    class Coordinates {
+        -Long id
+        -Double x
+        -Float y
+        -long version
+    }
+    class MagicCity {
+        -Long id
+        -String name
+        -Double area
+        -Long population
+        -LocalDate establishmentDate
+        -BookCreatureType governor
+        -Boolean capital
+        -Integer populationDensity
+        -long version
+    }
+    class Ring {
+        -Long id
+        -String name
+        -int weight
+        -long version
+    }
+    class BookCreatureType {
+        <<enumeration>>
+        HOBBIT
+        ELF
+        HUMAN
+        GOLLUM
+    }
+    class AppUser {
+        -Long id
+        -String username
+        -String passwordHash
+        -LocalDateTime createdAt
+    }
+    BookCreature "*" --> "1" Coordinates : coordinates
+    BookCreature "*" --> "1" MagicCity : creatureLocation
+    BookCreature "0..1" --> "0..1" Ring : ring
+    BookCreature ..> BookCreatureType
+    MagicCity ..> BookCreatureType : governor

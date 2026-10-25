@@ -1,0 +1,20 @@
+embed-server --server-config=standalone.xml --std-out=discard
+
+try
+    module add --name=org.postgresql.jdbc --resources=${pg.driver.jar} --dependencies=java.logging,java.sql,java.naming,jakarta.transaction.api
+catch
+    echo Модуль org.postgresql.jdbc уже установлен, пропускаю
+end-try
+
+if (outcome != success) of /subsystem=datasources/jdbc-driver=postgresql:read-resource
+    /subsystem=datasources/jdbc-driver=postgresql:add(driver-name=postgresql, driver-module-name=org.postgresql.jdbc, driver-class-name=org.postgresql.Driver, driver-xa-datasource-class-name=org.postgresql.xa.PGXADataSource)
+end-if
+
+if (outcome == success) of /subsystem=datasources/data-source=BookCreaturesDS:read-resource
+    data-source remove --name=BookCreaturesDS
+end-if
+
+data-source add --name=BookCreaturesDS --jndi-name=java:jboss/datasources/BookCreaturesDS --driver-name=postgresql --connection-url=${db.url} --user-name=${db.user} --password=${db.password} --min-pool-size=1 --max-pool-size=10 --validate-on-match=true --background-validation=false --valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker --exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter
+
+echo Готово: источник данных BookCreaturesDS настроен
+stop-embedded-server

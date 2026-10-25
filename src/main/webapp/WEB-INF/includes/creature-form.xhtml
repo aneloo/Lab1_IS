@@ -1,0 +1,166 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+    <div class="form-grid">
+        <p:outputLabel for="name" value="Имя"/>
+        <p:inputText id="name" value="#{form.creature.name}" maxlength="255"/>
+        <p:message for="name" display="text"/>
+
+        <p:outputLabel for="age" value="Возраст (> 0)"/>
+        <p:inputNumber id="age" value="#{form.creature.age}" decimalPlaces="0" minValue="1"
+                       maxValue="2147483647" thousandSeparator="" required="true"
+                       requiredMessage="Возраст обязателен"/>
+        <p:message for="age" display="text"/>
+
+        <p:outputLabel for="type" value="Тип существа"/>
+        <p:selectOneMenu id="type" value="#{form.creature.creatureType}">
+            <f:selectItem itemLabel="— выберите —" itemValue="#{null}" noSelectionOption="true"/>
+            <f:selectItems value="#{options.creatureTypes}"/>
+        </p:selectOneMenu>
+        <p:message for="type" display="text"/>
+
+        <p:outputLabel for="attack" value="Уровень атаки (> 0, можно пусто)"/>
+        <p:inputNumber id="attack" value="#{form.creature.attackLevel}" decimalPlaces="0" minValue="1"
+                       maxValue="2147483647" thousandSeparator=""/>
+        <p:message for="attack" display="text"/>
+
+        <p:outputLabel for="defense" value="Уровень защиты (> 0, можно пусто)"/>
+        <p:inputNumber id="defense" value="#{form.creature.defenseLevel}" decimalPlaces="3" minValue="0.001"
+                       maxValue="1000000000" thousandSeparator="" decimalSeparator="."/>
+        <p:message for="defense" display="text"/>
+    </div>
+
+    <div class="section-title">Координаты</div>
+    <p:outputPanel id="coordsPanel">
+        <p:selectOneButton value="#{form.coordinatesMode}" styleClass="mode-switch">
+            <f:selectItems value="#{edit ? options.editModes : options.createModes}" var="m"
+                           itemValue="#{m}" itemLabel="#{msg['linkMode.'+=m]}"/>
+            <p:ajax process="@this" listener="#{controller.refreshOptions}" update="coordsPanel"/>
+        </p:selectOneButton>
+
+        <h:panelGroup styleClass="form-grid" layout="block" rendered="#{form.coordinatesMode == 'EXISTING'}">
+            <p:outputLabel for="coordsId" value="Существующие координаты"/>
+            <p:selectOneMenu id="coordsId" value="#{form.coordinatesId}" filter="true" filterMatchMode="contains"
+                             required="true" requiredMessage="Выберите координаты из списка">
+                <f:selectItem itemLabel="— выберите —" itemValue="#{null}" noSelectionOption="true"/>
+                <f:selectItems value="#{form.existingCoordinates}" var="o" itemValue="#{o.id}"
+                               itemLabel="##{o.id} (#{o.x}; #{o.y})"/>
+            </p:selectOneMenu>
+            <p:message for="coordsId" display="text"/>
+        </h:panelGroup>
+
+        <h:panelGroup styleClass="form-grid" layout="block" rendered="#{form.showFields(form.coordinatesMode)}">
+            <p:outputLabel for="x" value="X"/>
+            <p:inputNumber id="x" value="#{form.coordinates.x}" decimalPlaces="6" thousandSeparator=""
+                           decimalSeparator="." minValue="-1000000000" maxValue="1000000000"/>
+            <p:message for="x" display="text"/>
+
+            <p:outputLabel for="y" value="Y"/>
+            <p:inputNumber id="y" value="#{form.coordinates.y}" decimalPlaces="4" thousandSeparator=""
+                           decimalSeparator="." minValue="-1000000000" maxValue="1000000000"/>
+            <p:message for="y" display="text"/>
+        </h:panelGroup>
+        <h:outputText styleClass="muted" rendered="#{form.coordinatesMode == 'CURRENT'}"
+                      value="Изменения применятся к текущим координатам (у всех персонажей, которые на них ссылаются)."/>
+    </p:outputPanel>
+
+    <div class="section-title">Город (MagicCity)</div>
+    <p:outputPanel id="cityPanel">
+        <p:selectOneButton value="#{form.cityMode}" styleClass="mode-switch">
+            <f:selectItems value="#{edit ? options.editModes : options.createModes}" var="m"
+                           itemValue="#{m}" itemLabel="#{msg['linkMode.'+=m]}"/>
+            <p:ajax process="@this" listener="#{controller.refreshOptions}" update="cityPanel"/>
+        </p:selectOneButton>
+
+        <h:panelGroup styleClass="form-grid" layout="block" rendered="#{form.cityMode == 'EXISTING'}">
+            <p:outputLabel for="cityId" value="Существующий город"/>
+            <p:selectOneMenu id="cityId" value="#{form.cityId}" filter="true" filterMatchMode="contains"
+                             required="true" requiredMessage="Выберите город из списка">
+                <f:selectItem itemLabel="— выберите —" itemValue="#{null}" noSelectionOption="true"/>
+                <f:selectItems value="#{form.existingCities}" var="o" itemValue="#{o.id}"
+                               itemLabel="##{o.id} #{o.name}"/>
+            </p:selectOneMenu>
+            <p:message for="cityId" display="text"/>
+        </h:panelGroup>
+
+        <h:panelGroup styleClass="form-grid" layout="block" rendered="#{form.showFields(form.cityMode)}">
+            <p:outputLabel for="cityName" value="Название"/>
+            <p:inputText id="cityName" value="#{form.city.name}" maxlength="255"/>
+            <p:message for="cityName" display="text"/>
+
+            <p:outputLabel for="area" value="Площадь (> 0)"/>
+            <p:inputNumber id="area" value="#{form.city.area}" decimalPlaces="3" minValue="0.001"
+                           maxValue="1000000000000" thousandSeparator="" decimalSeparator="."/>
+            <p:message for="area" display="text"/>
+
+            <p:outputLabel for="population" value="Население (> 0)"/>
+            <p:inputNumber id="population" value="#{form.city.population}" decimalPlaces="0" minValue="1"
+                           maxValue="9000000000000000" thousandSeparator=""/>
+            <p:message for="population" display="text"/>
+
+            <p:outputLabel for="established" value="Дата основания"/>
+            <p:datePicker id="established" value="#{form.city.establishmentDate}" pattern="dd.MM.yyyy"
+                          showIcon="true" yearNavigator="true" monthNavigator="true" yearRange="1:2100"
+                          converterMessage="Дата должна быть в формате ДД.ММ.ГГГГ"/>
+            <p:message for="established" display="text"/>
+
+            <p:outputLabel for="governor" value="Правитель"/>
+            <p:selectOneMenu id="governor" value="#{form.city.governor}">
+                <f:selectItem itemLabel="— выберите —" itemValue="#{null}" noSelectionOption="true"/>
+                <f:selectItems value="#{options.creatureTypes}"/>
+            </p:selectOneMenu>
+            <p:message for="governor" display="text"/>
+
+            <p:outputLabel for="capital" value="Столица"/>
+            <p:selectOneMenu id="capital" value="#{form.city.capital}">
+                <f:selectItem itemLabel="— выберите —" itemValue="#{null}" noSelectionOption="true"/>
+                <f:selectItem itemLabel="Да" itemValue="#{true}"/>
+                <f:selectItem itemLabel="Нет" itemValue="#{false}"/>
+            </p:selectOneMenu>
+            <p:message for="capital" display="text"/>
+
+            <p:outputLabel for="density" value="Плотность населения (> 0, можно пусто)"/>
+            <p:inputNumber id="density" value="#{form.city.populationDensity}" decimalPlaces="0" minValue="1"
+                           maxValue="2147483647" thousandSeparator=""/>
+            <p:message for="density" display="text"/>
+        </h:panelGroup>
+        <h:outputText styleClass="muted" rendered="#{form.cityMode == 'CURRENT'}"
+                      value="Изменения применятся к текущему городу (у всех его жителей)."/>
+    </p:outputPanel>
+
+    <div class="section-title">Кольцо (необязательно)</div>
+    <p:outputPanel id="ringPanel">
+        <p:selectOneButton value="#{form.ringMode}" styleClass="mode-switch">
+            <f:selectItems value="#{edit ? options.ringEditModes : options.ringCreateModes}" var="m"
+                           itemValue="#{m}" itemLabel="#{msg['linkMode.'+=m]}"
+                           itemDisabled="#{m == 'CURRENT' and form.ringId == null}"/>
+            <p:ajax process="@this" listener="#{controller.refreshOptions}" update="ringPanel"/>
+        </p:selectOneButton>
+
+        <h:panelGroup styleClass="form-grid" layout="block" rendered="#{form.ringMode == 'EXISTING'}">
+            <p:outputLabel for="ringId" value="Свободное кольцо"/>
+            <p:selectOneMenu id="ringId" value="#{form.ringId}" filter="true" filterMatchMode="contains"
+                             required="true" requiredMessage="Выберите кольцо из списка">
+                <f:selectItem itemLabel="— выберите —" itemValue="#{null}" noSelectionOption="true"/>
+                <f:selectItems value="#{form.existingRings}" var="o" itemValue="#{o.id}"
+                               itemLabel="##{o.id} #{o.name} (вес #{o.weight})"/>
+            </p:selectOneMenu>
+            <p:message for="ringId" display="text"/>
+        </h:panelGroup>
+
+        <h:panelGroup styleClass="form-grid" layout="block" rendered="#{form.showFields(form.ringMode)}">
+            <p:outputLabel for="ringName" value="Название кольца"/>
+            <p:inputText id="ringName" value="#{form.ring.name}" maxlength="255"/>
+            <p:message for="ringName" display="text"/>
+
+            <p:outputLabel for="weight" value="Вес (> 0)"/>
+            <p:inputNumber id="weight" value="#{form.ring.weight}" decimalPlaces="0" minValue="1"
+                           maxValue="2147483647" thousandSeparator="" required="true"
+                           requiredMessage="Вес кольца обязателен"/>
+            <p:message for="weight" display="text"/>
+        </h:panelGroup>
+    </p:outputPanel>
+</ui:composition>

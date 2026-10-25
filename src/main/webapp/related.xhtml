@@ -1,0 +1,89 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="title">Связанные объекты</ui:define>
+
+    <ui:define name="content">
+        <h:form id="relForm">
+            <p:remoteCommand name="refreshPage" process="@this" global="false"
+                             actionListener="#{relatedController.load}" update="tables"/>
+            <p:messages id="messages" closable="true"/>
+            <p class="muted">При удалении координат или города удаляются и все персонажи, которые с ними связаны.
+                Кольцо необязательно, поэтому при его удалении у владельца просто пропадает кольцо.</p>
+
+            <p:outputPanel id="tables">
+            <div class="card">
+                <h2>Координаты</h2>
+                <p:dataTable value="#{relatedController.coordinates}" var="u" size="small" paginator="true" rows="10"
+                             paginatorPosition="bottom" emptyMessage="Нет координат">
+                    <p:column headerText="ID" width="70">#{u.item().id}</p:column>
+                    <p:column headerText="X">#{u.item().x}</p:column>
+                    <p:column headerText="Y">#{u.item().y}</p:column>
+                    <p:column headerText="Персонажей">#{u.creatures()}</p:column>
+                    <p:column width="60">
+                        <p:commandButton icon="pi pi-trash" styleClass="ui-button-flat ui-button-danger"
+                                         action="#{relatedController.deleteCoordinates(u.item().id)}" update="@form">
+                            <p:confirm header="Удаление" icon="pi pi-exclamation-triangle"
+                                       message="Удалить координаты ##{u.item().id} и связанных персонажей (#{u.creatures()})?"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </div>
+
+            <div class="card">
+                <h2>Города</h2>
+                <p:dataTable value="#{relatedController.cities}" var="u" size="small" paginator="true" rows="10"
+                             paginatorPosition="bottom" emptyMessage="Нет городов">
+                    <p:column headerText="ID" width="70">#{u.item().id}</p:column>
+                    <p:column headerText="Название">#{u.item().name}</p:column>
+                    <p:column headerText="Площадь">#{u.item().area}</p:column>
+                    <p:column headerText="Население">#{u.item().population}</p:column>
+                    <p:column headerText="Основан">
+                        <h:outputText value="#{u.item().establishmentDate}">
+                            <f:convertDateTime type="localDate" pattern="dd.MM.yyyy"/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="Правитель">#{u.item().governor}</p:column>
+                    <p:column headerText="Столица">#{u.item().capital ? 'да' : 'нет'}</p:column>
+                    <p:column headerText="Плотность">#{u.item().populationDensity}</p:column>
+                    <p:column headerText="Персонажей">#{u.creatures()}</p:column>
+                    <p:column width="60">
+                        <p:commandButton icon="pi pi-trash" styleClass="ui-button-flat ui-button-danger"
+                                         action="#{relatedController.deleteCity(u.item().id)}" update="@form">
+                            <p:confirm header="Удаление" icon="pi pi-exclamation-triangle"
+                                       message="Удалить город ##{u.item().id} и всех его жителей (#{u.creatures()})?"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </div>
+
+            <div class="card">
+                <h2>Кольца</h2>
+                <p:dataTable value="#{relatedController.rings}" var="u" size="small" paginator="true" rows="10"
+                             paginatorPosition="bottom" emptyMessage="Нет колец">
+                    <p:column headerText="ID" width="70">#{u.ring().id}</p:column>
+                    <p:column headerText="Название">#{u.ring().name}</p:column>
+                    <p:column headerText="Вес">#{u.ring().weight}</p:column>
+                    <p:column headerText="Владелец">
+                        <h:link outcome="/view" value="##{u.ownerId()} «#{u.ownerName()}»" rendered="#{u.hasOwner()}">
+                            <f:param name="id" value="#{u.ownerId()}"/>
+                        </h:link>
+                        <h:outputText styleClass="muted" value="свободно" rendered="#{not u.hasOwner()}"/>
+                    </p:column>
+                    <p:column width="60">
+                        <p:commandButton icon="pi pi-trash" styleClass="ui-button-flat ui-button-danger"
+                                         action="#{relatedController.deleteRing(u.ring().id)}" update="@form">
+                            <p:confirm header="Удаление" icon="pi pi-exclamation-triangle"
+                                       message="Удалить кольцо ##{u.ring().id}?"/>
+                        </p:commandButton>
+                    </p:column>
+                </p:dataTable>
+            </div>
+            </p:outputPanel>
+        </h:form>
+    </ui:define>
+</ui:composition>

@@ -1,0 +1,31 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/templates/layout.xhtml">
+
+    <ui:define name="title">Добавление объекта</ui:define>
+
+    <ui:define name="content">
+        <h:form id="createForm">
+            <div class="card">
+                <p:messages id="messages" globalOnly="true" closable="true"/>
+                <p class="muted">id и дата создания генерируются автоматически. Координаты, город и кольцо
+                    можно создать заново или выбрать из уже существующих в системе.</p>
+
+                <ui:include src="/WEB-INF/includes/creature-form.xhtml">
+                    <ui:param name="form" value="#{createController.form}"/>
+                    <ui:param name="controller" value="#{createController}"/>
+                    <ui:param name="edit" value="#{false}"/>
+                </ui:include>
+
+                <div class="actions">
+                    <p:commandButton value="Создать" icon="pi pi-check" action="#{createController.save}"
+                                     process="@form" update="@form"/>
+                    <p:button value="К списку" icon="pi pi-list" outcome="/index" styleClass="ui-button-flat"/>
+                </div>
+            </div>
+        </h:form>
+    </ui:define>
+</ui:composition>

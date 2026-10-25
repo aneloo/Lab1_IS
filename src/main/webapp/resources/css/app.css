@@ -1,0 +1,142 @@
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f4f6f9;
+    color: #212529;
+}
+
+.app-menu {
+    border-radius: 0 !important;
+    border-width: 0 0 1px 0 !important;
+}
+
+.app-user {
+    margin-right: 12px;
+    color: #495057;
+}
+
+.app-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 16px 24px 48px;
+}
+
+.app-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin: 8px 0 16px;
+}
+
+.card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+}
+
+.card h2 {
+    font-size: 1.1rem;
+    margin: 0 0 12px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 200px minmax(220px, 320px) 1fr;
+    gap: 8px 12px;
+    align-items: center;
+}
+
+.form-grid .ui-message {
+    margin: 0;
+}
+
+.form-grid .ui-inputfield, .form-grid .ui-selectonemenu, .form-grid .ui-inputnumber input,
+.form-grid .ui-datepicker input {
+    width: 100%;
+}
+
+.section-title {
+    font-weight: 600;
+    margin: 16px 0 8px;
+    padding-top: 12px;
+    border-top: 1px solid #e9ecef;
+}
+
+.mode-switch {
+    margin-bottom: 8px;
+}
+
+.actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.row-actions {
+    white-space: nowrap;
+}
+
+.details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.kv {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 6px 12px;
+}
+
+.kv .k {
+    color: #6c757d;
+}
+
+.muted {
+    color: #6c757d;
+}
+
+.result {
+    margin-left: 12px;
+    font-weight: 600;
+}
+
+.op {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+}
+
+.auth-wrap {
+    display: flex;
+    justify-content: center;
+    padding-top: 10vh;
+}
+
+.auth-card {
+    width: 360px;
+}
+
+.auth-card .ui-inputfield, .auth-card .ui-password, .auth-card .ui-password input {
+    width: 100%;
+}
+
+.auth-card .field {
+    margin-bottom: 12px;
+}
+
+.form-grid .ui-calendar {
+    display: flex;
+    width: 100%;
+}
+
+.form-grid .ui-calendar input {
+    flex: 1;
+    min-width: 0;
+}
+
+.form-grid .ui-calendar .ui-datepicker-trigger {
+    flex: none;
+}
